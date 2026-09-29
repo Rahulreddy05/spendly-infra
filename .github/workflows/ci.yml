@@ -28,3 +28,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: cp .env.example .env && docker compose config --quiet
+        env:
+          NODE_AUTH_TOKEN: placeholder # only validates config; nothing is built
