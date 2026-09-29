@@ -1,11 +1,11 @@
 # Spendly Engineering Standards
 
 These rules apply to **every change** in every Spendly repo (`spendly-api`,
-`spendly-web`, `spendly-infra`). They are not optional and are not restated in
+`spendly-web`, `spendly-mobile`, `spendly-shared`, `spendly-infra`). They are not optional and are not restated in
 task requests — read this file before writing code and check your change
 against the Definition of Done at the bottom before calling it finished.
 
-The same file lives in each repo. If you change it, change all three.
+The same file lives in each repo. If you change it, change all five.
 
 ---
 
@@ -69,7 +69,10 @@ Every feature is built as if it ships to real users today:
 - **Pure functions for calculations** (analytics maths, mappers) so they can be
   unit-tested without a database.
 - SOLID, small files, one responsibility each. Prefer composition over inheritance.
-- The web app mirrors this: API calls in `src/api/`, server state in TanStack Query
+- **Shared code lives in `@rahulreddy05/spendly-shared`** (types, constants,
+  API client, formatting). Web and mobile import it; never copy it into an app.
+  A change there is released as a new semver version, then apps upgrade.
+- The web app mirrors this: API calls via the shared client, server state in TanStack Query
   hooks in `src/hooks/`, presentational components in `src/components/`, pages in
   `src/pages/`.
 
@@ -118,7 +121,24 @@ Every feature is built as if it ships to real users today:
 - The web app and API are served on one origin via Ingress (`/` → web,
   `/api` → API), so production needs no CORS.
 
-## 8. Code style and git
+## 8. Mobile (spendly-mobile)
+
+- React Native with **Expo** (managed workflow, Expo Router). `ios/` and
+  `android/` are generated — configure native behaviour in `app.json` and
+  config plugins, never by hand. Add packages with `npx expo install`.
+- Tokens: access token in memory; refresh token in the Keychain/Keystore via
+  `expo-secure-store`. Never AsyncStorage for secrets.
+- Every request sends `X-Client-Platform` / `X-Client-Version`. A breaking API
+  change must raise `MIN_IOS_APP_VERSION` / `MIN_ANDROID_APP_VERSION` and keep
+  older app versions working until then — installed apps are not updated instantly.
+- Accessibility: every interactive element has a role and label; touch targets
+  are at least 44pt; charts have a text equivalent.
+- Tests: Jest (`jest-expo`) + React Native Testing Library, routes tested with
+  `expo-router/testing-library`. Never call the real API or native modules.
+- Builds and store releases go through EAS; Docker/Kubernetes apply to the
+  backend and web only.
+
+## 9. Code style and git
 
 - TypeScript strict mode everywhere. No `any` without a comment saying why.
 - ESLint + Prettier; zero warnings.
@@ -132,9 +152,10 @@ Every feature is built as if it ships to real users today:
 
 ## Definition of Done
 
-- [ ] Follows sections 2–8 above
+- [ ] Follows sections 2–9 above
 - [ ] No magic values — new constants are in `src/constants/`
 - [ ] Unit and/or integration tests added and passing; coverage thresholds met
 - [ ] `typecheck`, `lint`, `test`, and `build` all pass
-- [ ] Docker image builds; Kubernetes manifests updated if config/env changed
+- [ ] Docker image builds; Kubernetes manifests updated if config/env changed (backend/web)
+- [ ] Mobile: `npx expo-doctor` passes and iOS + Android bundles build (`npx expo export`)
 - [ ] `.env.example`, `CLAUDE.md`, and README updated if behaviour or config changed

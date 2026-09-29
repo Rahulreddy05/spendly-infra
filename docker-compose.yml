@@ -60,7 +60,11 @@ services:
 
   web:
     image: spendly-web:${IMAGE_TAG:-local}
-    build: ../spendly-web
+    build:
+      context: ../spendly-web
+      # GitHub Packages token for @rahulreddy05/spendly-shared (BuildKit secret,
+      # never stored in the image). Export NODE_AUTH_TOKEN=$(gh auth token) first.
+      secrets: [npm_token]
     environment:
       API_UPSTREAM: http://api:4000
     ports:
@@ -72,3 +76,7 @@ services:
 
 volumes:
   pgdata:
+
+secrets:
+  npm_token:
+    environment: NODE_AUTH_TOKEN
