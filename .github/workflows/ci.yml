@@ -28,5 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: cp .env.example .env && docker compose config --quiet
+        # Only validates the file; nothing is built or run. .env.example leaves
+        # secrets blank on purpose, so give the required ones placeholders.
         env:
-          NODE_AUTH_TOKEN: placeholder # only validates config; nothing is built
+          NODE_AUTH_TOKEN: placeholder
+          JWT_ACCESS_SECRET: placeholder
+          JWT_REFRESH_SECRET: placeholder
