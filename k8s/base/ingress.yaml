@@ -1,0 +1,22 @@
+# One origin for the whole app: `/api` goes straight to the API, everything else
+# to the web app. Same-origin means no CORS and a working SameSite=Strict cookie.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spendly
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: spendly.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service: { name: spendly-api, port: { name: http } }
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: spendly-web, port: { name: http } }

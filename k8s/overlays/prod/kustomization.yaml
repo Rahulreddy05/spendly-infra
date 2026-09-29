@@ -1,0 +1,41 @@
+# Production. Postgres is a managed service (not in-cluster); TLS via cert-manager.
+#   kubectl apply -k k8s/overlays/prod
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: spendly
+
+resources:
+  - ../../base
+
+images:
+  # CI pushes immutable tags; bump these per release (or let your CD tool do it).
+  - name: spendly-api
+    newName: ghcr.io/rahulreddy05/spendly-api
+    newTag: '1.0.0'
+  - name: spendly-web
+    newName: ghcr.io/rahulreddy05/spendly-web
+    newTag: '1.0.0'
+
+secretGenerator:
+  - name: spendly-api-secrets
+    envs: [secrets.env]
+
+patches:
+  - target: { kind: ConfigMap, name: spendly-api-config }
+    patch: |-
+      - op: replace
+        path: /data/CORS_ORIGINS
+        value: https://spendly.example.com
+  - target: { kind: Ingress, name: spendly }
+    patch: |-
+      - op: add
+        path: /metadata/annotations/cert-manager.io~1cluster-issuer
+        value: letsencrypt-prod
+      - op: add
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1force-ssl-redirect
+        value: 'true'
+      - op: add
+        path: /spec/tls
+        value:
+          - hosts: [spendly.example.com]
+            secretName: spendly-tls

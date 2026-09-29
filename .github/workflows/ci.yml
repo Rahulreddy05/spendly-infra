@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install kubeconform
+        run: |
+          curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
+          sudo mv kubeconform /usr/local/bin/
+      - name: Render and validate every overlay
+        run: |
+          for overlay in k8s/overlays/*/; do
+            # secretGenerator needs the files to exist; CI uses the examples.
+            for example in "$overlay"*.example.env; do cp "$example" "${example/.example/}"; done
+            echo "== $overlay"
+            kubectl kustomize "$overlay" | kubeconform -strict -summary -kubernetes-version 1.33.0
+          done
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env && docker compose config --quiet
