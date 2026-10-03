@@ -45,6 +45,9 @@ services:
       DATABASE_URL: *database_url
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set JWT_ACCESS_SECRET in .env}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env}
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?set DATA_ENCRYPTION_KEY in .env}
+      SMTP_URL: smtp://mailpit:1025
+      EMAIL_FROM: Spendly <no-reply@spendly.dev>
       CORS_ORIGINS: http://localhost:8080
       # Plain HTTP locally; the cookie is Secure in every HTTPS environment.
       COOKIE_SECURE: 'false'
@@ -56,6 +59,8 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+      mailpit:
+        condition: service_started
     restart: unless-stopped
 
   web:
@@ -72,6 +77,13 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    restart: unless-stopped
+
+  # Catches every email the API sends (verification codes, alerts). Inbox: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '8025:8025'
     restart: unless-stopped
 
 volumes:

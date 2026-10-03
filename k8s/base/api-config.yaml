@@ -13,6 +13,8 @@ data:
   REFRESH_TOKEN_TTL_DAYS: '30'
   CORS_ORIGINS: https://spendly.example.com
   COOKIE_SECURE: 'true'
+  EMAIL_FROM: Spendly <no-reply@spendly.example.com>
+  BREACHED_PASSWORD_CHECK: 'true'
   # Raise when shipping an API change older mobile apps cannot handle.
   MIN_IOS_APP_VERSION: 1.0.0
   MIN_ANDROID_APP_VERSION: 1.0.0

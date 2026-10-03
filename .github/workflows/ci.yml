@@ -34,3 +34,4 @@ jobs:
           NODE_AUTH_TOKEN: placeholder
           JWT_ACCESS_SECRET: placeholder
           JWT_REFRESH_SECRET: placeholder
+          DATA_ENCRYPTION_KEY: placeholder
