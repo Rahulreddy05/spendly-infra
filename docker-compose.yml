@@ -51,11 +51,11 @@ services:
       CORS_ORIGINS: http://localhost:8080
       # Plain HTTP locally; the cookie is Secure in every HTTPS environment.
       COOKIE_SECURE: 'false'
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      PLAID_CLIENT_ID: ${PLAID_CLIENT_ID:-}
+      PLAID_SECRET: ${PLAID_SECRET:-}
+      PLAID_ENV: ${PLAID_ENV:-sandbox}
     ports:
-      - '4000:4000' # direct API access, e.g. for `stripe listen --forward-to`
+      - '4000:4000' # direct API access (the mobile simulators call it here)
     depends_on:
       migrate:
         condition: service_completed_successfully
