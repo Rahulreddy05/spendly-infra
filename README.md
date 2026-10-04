@@ -65,11 +65,16 @@ open http://spendly.localhost
 | Secrets | `Secret`s from git-ignored env files (prod: use External Secrets / Sealed Secrets) |
 | Routing | One origin: Ingress sends `/api` to the API and `/` to the web app — no CORS |
 
-### Stripe webhooks
+### Plaid (bank linking)
 
-Point a Stripe webhook endpoint at `https://<your-host>/api/v1/webhooks/stripe` with
-the `financial_connections.account.*` events, and put its signing secret in
-`STRIPE_WEBHOOK_SECRET`. Locally: `stripe listen --forward-to localhost:4000/api/v1/webhooks/stripe`.
+- Keys: `PLAID_CLIENT_ID` and `PLAID_SECRET` go in the Secret (sandbox keys locally,
+  production keys only in the prod Secret). Non-secret settings are in the API ConfigMap.
+- Webhooks: `PLAID_WEBHOOK_URL` must be the public `https://<host>/api/v1/webhooks/plaid`.
+  Plaid signs every webhook (ES256 JWT); the API verifies it, so the endpoint needs no other auth.
+- OAuth banks: register `PLAID_REDIRECT_URI` (`https://<host>/oauth-return`) and the
+  Android package name `com.rahulreddy05.spendly` under Dashboard → API → Allowed redirect URIs / Android package names.
+- Locally there are no webhooks; use **Sync now** in the app.
+- The web CSP allows Plaid Link (`cdn.plaid.com`); the API needs outbound HTTPS to `*.plaid.com`.
 
 ## Standards
 

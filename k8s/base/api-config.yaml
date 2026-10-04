@@ -18,3 +18,10 @@ data:
   # Raise when shipping an API change older mobile apps cannot handle.
   MIN_IOS_APP_VERSION: 1.0.0
   MIN_ANDROID_APP_VERSION: 1.0.0
+  # Plaid bank linking. Keys (PLAID_CLIENT_ID, PLAID_SECRET) are in the Secret.
+  PLAID_ENV: production
+  # Plaid posts transaction updates here (must be public HTTPS).
+  PLAID_WEBHOOK_URL: https://spendly.example.com/api/v1/webhooks/plaid
+  # Web OAuth return page and Android app id; both registered in the Plaid Dashboard.
+  PLAID_REDIRECT_URI: https://spendly.example.com/oauth-return
+  PLAID_ANDROID_PACKAGE_NAME: com.rahulreddy05.spendly

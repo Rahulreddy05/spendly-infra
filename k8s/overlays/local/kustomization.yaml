@@ -44,6 +44,15 @@ patches:
       - op: replace
         path: /data/COOKIE_SECURE
         value: 'false'
+      # Sandbox keys locally; Plaid cannot reach a local cluster, so no webhooks
+      # (use "Sync now") and no OAuth redirect (sandbox banks don't need it).
+      - op: replace
+        path: /data/PLAID_ENV
+        value: sandbox
+      - op: remove
+        path: /data/PLAID_WEBHOOK_URL
+      - op: remove
+        path: /data/PLAID_REDIRECT_URI
   - target: { kind: Ingress, name: spendly }
     patch: |-
       - op: replace
